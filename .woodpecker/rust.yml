@@ -1,0 +1,24 @@
+steps:
+  clippy:
+    name: Clippy
+    image: docker.io/rust:latest
+    commands:
+      - curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install linux
+        --extra-conf "sandbox = false"
+        --init none
+        --no-confirm
+      - . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+      - cargo install cargo-hack
+      - nix develop --impure -c cargo hack --each-feature --all clippy -- -D warnings
+
+  fmt:
+    name: Formatting
+    image: docker.io/rust:latest
+    commands:
+      - curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install linux
+        --extra-conf "sandbox = false"
+        --init none
+        --no-confirm
+      - . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+      - cargo install cargo-hack
+      - nix develop --impure -c cargo hack --each-feature --all clippy -- -D warnings
