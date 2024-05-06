@@ -20,5 +20,35 @@ steps:
         --init none
         --no-confirm
       - . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
-      - cargo install cargo-hack
-      - nix develop --impure -c cargo hack --each-feature --all clippy -- -D warnings
+      - nix develop --impure -c cargo fmt --all -- --check
+
+  test:
+    name: Test
+    image: docker.io/rust:latest
+    environment:
+      DATABASE_URL: "postgres://postgres:postgres@localhost/test_db"
+      MINIO_URL: "http://127.0.0.1:9000"
+      REDIS_URL: "redis://localhost"
+    commands:
+      - curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install linux
+        --extra-conf "sandbox = false"
+        --init none
+        --no-confirm
+      - . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+      - cargo install cargo-nextest
+      - nix develop --impure --command bash -c "unset LD_LIBRARY_PATH && cargo nextest run --all-features"
+
+services:
+  - name: postgres
+    image: docker.io/postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+  - name: minio
+    image: docker.io/bitnami/minio:latest
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+  - name: redis
+    image: docker.io/redis:latest
