@@ -2,6 +2,9 @@ steps:
   clippy:
     name: Clippy
     image: docker.io/rust:latest
+    environment:
+      NIX_AFFINITY_HACK: 0
+    depends_on: []
     commands:
       - curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install linux
         --extra-conf "sandbox = false"
@@ -14,6 +17,9 @@ steps:
   fmt:
     name: Formatting
     image: docker.io/rust:latest
+    environment:
+      NIX_AFFINITY_HACK: 0
+    depends_on: []
     commands:
       - curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install linux
         --extra-conf "sandbox = false"
@@ -26,9 +32,11 @@ steps:
     name: Test
     image: docker.io/rust:latest
     environment:
+      NIX_AFFINITY_HACK: 0
       DATABASE_URL: "postgres://postgres:postgres@localhost/test_db"
       MINIO_URL: "http://127.0.0.1:9000"
       REDIS_URL: "redis://localhost"
+    depends_on: [Clippy, Formatting]
     commands:
       - curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install linux
         --extra-conf "sandbox = false"
