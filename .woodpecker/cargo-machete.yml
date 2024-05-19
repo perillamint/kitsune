@@ -1,0 +1,8 @@
+
+steps:
+  machete:
+    name: cargo-machete
+    image: docker.io/rust:latest
+    commands:
+      - cargo install cargo-machete
+      - cargo machete
