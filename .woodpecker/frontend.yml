@@ -9,6 +9,7 @@ steps:
     environment:
       NIX_AFFINITY_HACK: 0
     depends_on: []
+    directory: ./kitsune-fe
     commands:
       - . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
       - nix develop ..#frontend --command bash -c "yarn && yarn build"
@@ -19,6 +20,7 @@ steps:
     environment:
       NIX_AFFINITY_HACK: 0
     depends_on: []
+    directory: ./kitsune-fe
     commands:
       - . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
       - nix develop ..#frontend --command bash -c "yarn && yarn lint"
