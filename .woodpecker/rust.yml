@@ -3,6 +3,17 @@ when:
   - event: [push, pull_request]
 
 steps:
+  prepare:
+    name: Prepare
+    image: ghcr.io/perillamint/nix-testcontainer
+    environment:
+      NIX_AFFINITY_HACK: 0
+      # store cargo data in repo folder so that it gets cached between steps
+      CARGO_HOME: .cargo_home
+    depends_on: []
+    commands:
+      - cargo fetch
+
   clippy:
     name: Clippy
     image: ghcr.io/perillamint/nix-testcontainer
@@ -10,7 +21,7 @@ steps:
       NIX_AFFINITY_HACK: 0
       # store cargo data in repo folder so that it gets cached between steps
       CARGO_HOME: .cargo_home
-    depends_on: []
+    depends_on: [Prepare]
     commands:
       - . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
       - nix develop --impure -c cargo hack --each-feature --all clippy -- -D warnings
@@ -22,7 +33,7 @@ steps:
       NIX_AFFINITY_HACK: 0
       # store cargo data in repo folder so that it gets cached between steps
       CARGO_HOME: .cargo_home
-    depends_on: []
+    depends_on: [Prepare]
     commands:
       - . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
       - nix develop --impure -c cargo fmt --all -- --check
@@ -37,7 +48,7 @@ steps:
       DATABASE_URL: "postgres://postgres:postgres@postgres/test_db"
       MINIO_URL: "http://minio:9000"
       REDIS_URL: "redis://redis"
-    depends_on: [Clippy, Formatting]
+    depends_on: [Prepare, Clippy, Formatting]
     commands:
       - . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
       - nix develop --impure --command bash -c "unset LD_LIBRARY_PATH && cargo nextest run --all-features"
