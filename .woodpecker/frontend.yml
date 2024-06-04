@@ -1,0 +1,20 @@
+steps:
+  build:
+    name: Build frontend
+    image: ghcr.io/perillamint/nix-testcontainer
+    environment:
+      NIX_AFFINITY_HACK: 0
+    depends_on: []
+    commands:
+      - . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+      - nix develop ..#frontend --command bash -c "yarn && yarn build"
+
+  lints:
+    name: Check lints
+    image: ghcr.io/perillamint/nix-testcontainer
+    environment:
+      NIX_AFFINITY_HACK: 0
+    depends_on: []
+    commands:
+      - . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+      - nix develop ..#frontend --command bash -c "yarn && yarn lint"
