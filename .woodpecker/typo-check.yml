@@ -1,0 +1,14 @@
+when:
+  - branch: [dev/woodpecker]
+  - event: [push, pull_request]
+
+steps:
+  check-typos:
+    name: Spell-check repository source
+    image: ghcr.io/perillamint/nix-testcontainer
+    environment:
+      NIX_AFFINITY_HACK: 0
+    depends_on: []
+    directory: ./kitsune-fe
+    commands:
+      - typos
