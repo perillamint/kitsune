@@ -1,3 +1,7 @@
+when:
+  - branch: [dev/woodpecker]
+  - event: [push, pull_request]
+
 steps:
   build:
     name: Build frontend
