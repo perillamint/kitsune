@@ -2,7 +2,6 @@
 steps:
   machete:
     name: cargo-machete
-    image: docker.io/rust:latest
+    image: ghcr.io/perillamint/nix-testcontainer
     commands:
-      - cargo install cargo-machete
       - cargo machete

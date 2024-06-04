@@ -1,36 +1,27 @@
 steps:
   clippy:
     name: Clippy
-    image: docker.io/rust:latest
+    image: ghcr.io/perillamint/nix-testcontainer
     environment:
       NIX_AFFINITY_HACK: 0
     depends_on: []
     commands:
-      - curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install linux
-        --extra-conf "sandbox = false"
-        --init none
-        --no-confirm
       - . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
-      - cargo install cargo-hack
       - nix develop --impure -c cargo hack --each-feature --all clippy -- -D warnings
 
   fmt:
     name: Formatting
-    image: docker.io/rust:latest
+    image: ghcr.io/perillamint/nix-testcontainer
     environment:
       NIX_AFFINITY_HACK: 0
     depends_on: []
     commands:
-      - curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install linux
-        --extra-conf "sandbox = false"
-        --init none
-        --no-confirm
       - . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
       - nix develop --impure -c cargo fmt --all -- --check
 
   test:
     name: Test
-    image: docker.io/rust:latest
+    image: ghcr.io/perillamint/nix-testcontainer
     environment:
       NIX_AFFINITY_HACK: 0
       DATABASE_URL: "postgres://postgres:postgres@postgres/test_db"
@@ -38,12 +29,7 @@ steps:
       REDIS_URL: "redis://redis"
     depends_on: [Clippy, Formatting]
     commands:
-      - curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install linux
-        --extra-conf "sandbox = false"
-        --init none
-        --no-confirm
       - . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
-      - cargo install cargo-nextest
       - nix develop --impure --command bash -c "unset LD_LIBRARY_PATH && cargo nextest run --all-features"
 
 services:
